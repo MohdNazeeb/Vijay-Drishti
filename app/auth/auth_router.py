@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
-
+from fastapi.responses import RedirectResponse
 from app.database import get_db
 from app.models.user import User
 from app.schemas.user_schema import UserCreate, UserLogin
@@ -10,7 +10,7 @@ from app.auth.jwt_handler import create_access_token
 auth_router = APIRouter(tags=["Auth"])
 
 # ---------------- Register ----------------
-@auth_router.post("/register")
+@auth_router.post("/api/register")
 def register(user: UserCreate, db: Session = Depends(get_db)):
 
     # Check if userid already exists
@@ -36,7 +36,7 @@ def register(user: UserCreate, db: Session = Depends(get_db)):
     return {"message": "User registered successfully"}
 
 # ---------------- Login ----------------
-@auth_router.post("/login")
+@auth_router.post("/api/login")
 def login(credentials: UserLogin, db: Session = Depends(get_db)):
 
     user = db.query(User).filter(User.userid == credentials.userid).first()

@@ -17,7 +17,7 @@
     }
 
     body {
-        background: url('india.jpg') no-repeat center center/cover;
+        background: url('static/images/india.jpg') no-repeat center center/cover;
         height: 100vh;
         display: flex;
         justify-content: center;
@@ -136,24 +136,44 @@
 </div>
 
 <script>
-function registerUser() {
-    const name = document.getElementById("fullname").value.trim();
-    const uid = document.getElementById("userid").value.trim();
+async function registerUser() {
+    const fullname = document.getElementById("fullname").value.trim();
+    const userid = document.getElementById("userid").value.trim();
     const email = document.getElementById("email").value.trim();
-    const pass = document.getElementById("password").value.trim();
+    const password = document.getElementById("password").value.trim();
     const confirm = document.getElementById("confirm").value.trim();
 
-    if (pass !== confirm) {
+    if (password !== confirm) {
         alert("Passwords do not match!");
         return false;
     }
 
-    alert("Registration Successful!");
-    // Redirect if needed
-    // window.location.href = "login.html";
+    const response = await fetch("/api/register", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+            fullname: fullname,
+            userid: userid,
+            email: email,
+            password: password
+        })
+    });
+
+    const data = await response.json();
+
+    if (response.ok) {
+        alert("Registration Successful!");
+        window.location.href = "/login";
+    } else {
+        alert(data.detail || "Error while registering!");
+    }
+
     return false;
 }
 </script>
+
 
 </body>
 </html>
