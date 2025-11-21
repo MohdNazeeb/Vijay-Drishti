@@ -1,32 +1,17 @@
-# app/main.py
-
-from fastapi import FastAPI, Request
+from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 
-app = FastAPI(
-    title="Vijay Drishti Backend",
-    description="Backend for Vijay Drishti login/register + dashboard",
-    version="0.1.0"
-)
+from app.database import Base, engine
+from app.auth.auth_router import auth_router
 
-# Mount static files (css/js/images)
+# Create tables
+Base.metadata.create_all(bind=engine)
+
+app = FastAPI()
+
+# Static + templates
 app.mount("/static", StaticFiles(directory="app/static"), name="static")
-
-# Setup templates directory
 templates = Jinja2Templates(directory="app/templates")
 
-# Root endpoint (just for testing)
-@app.get("/")
-async def read_root(request: Request):
-    return templates.TemplateResponse("login.html", {"request": request, "title": "Login | Vijay Drishti"})
-
-# Example dashboard endpoint (protected routes to be added later)
-@app.get("/dashboard")
-async def dashboard(request: Request):
-    # TODO: add auth logic here
-    return templates.TemplateResponse("dashboard.html", {"request": request, "title": "Dashboard | Vijay Drishti"})
-
-if __name__ == "__main__":
-    import uvicorn
-    uvicorn.run("app.main:app", host="0.0.0.0", port=8000, reload=True)
+app.include_router(auth_router)
